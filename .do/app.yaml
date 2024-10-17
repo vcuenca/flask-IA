@@ -1,6 +1,6 @@
-name: sample-flask
+name: flask-IA
 services:
 - name: web
   github:
-    repo: digitalocean/sample-flask
+    repo: vcuenca/flask-IA
     branch: main
