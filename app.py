@@ -13,7 +13,7 @@ API_KEY = os.environ['SECRETO']
 # Función para verificar la clave API
 def verify_api_key(api_key):
     if api_key != API_KEY:
-        return jsonify({'message': 'Clave API inválida'}), 401
+        return jsonify({'message': 'Clave API inválida','api_key':api_key,'API_KEY':API_KEY}), 401
 
 # Endpoint protegido que requiere la clave API
 @app.route('/items', methods=['POST'])
