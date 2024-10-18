@@ -1,5 +1,45 @@
 import os
 from flask import Flask,request, jsonify, render_template
+import google.generativeai as genai
+import json
+import time
+
+API_KEY = os.environ['GEMINI_KEY']
+genai.configure(api_key=API_KEY)  # Reemplaza con tu clave API
+
+generation_config = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "application/json",
+}
+
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    generation_config=generation_config,
+)
+
+    prompt = f"""
+    Extrae la siguiente información del texto proporcionado:
+
+    * Fecha
+    * Capacidad
+    * Tipo de reunión
+    * Tipo de comida (desayuno, almuerzo, comida)
+
+    Texto: {input_text}
+
+    Devuelve la información en formato JSON:
+    {{
+      "fecha": "valor",
+      "capacidad": "valor",
+      "tipo_reunion": "valor",
+      "tipo_comida": "valor"
+    }}
+    """
+
+
 
 app = Flask(__name__)
 
@@ -16,7 +56,6 @@ def verify_api_key(api_key):
         return jsonify({'message': 'Clave API inválida'}), 401
 
 # Endpoint protegido que requiere la clave API
-@app.route('/merca-ia', methods=['POST'])
 def read_items():
     # Verifica la clave API en la cabecera de la solicitud
     api_key = request.headers.get('api_key')
@@ -27,4 +66,16 @@ def read_items():
     if response:
         return response
 
-    return jsonify({'items': ['Item 1', 'Item 2']})
+    # Obtiene el input del cuerpo de la solicitud
+    try:
+        data = request.get_json()
+        input_text = data.get('input_text') 
+        if not input_text:
+            return jsonify({'message': 'Falta el texto de entrada'}), 400
+    except:
+        return jsonify({'message': 'Formato de entrada inválido'}), 400
+
+    # Pasa el input al modelo
+    response = model.generate_content([prompt, input_text, "Clasificacion "])
+
+    return jsonify({'response': response})
