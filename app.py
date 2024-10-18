@@ -16,7 +16,7 @@ def verify_api_key(api_key):
         return jsonify({'message': 'Clave API inválida'}), 401
 
 # Endpoint protegido que requiere la clave API
-@app.route('/items', methods=['POST'])
+@app.route('/merca-ia', methods=['POST'])
 def read_items():
     # Verifica la clave API en la cabecera de la solicitud
     api_key = request.headers.get('api_key')
