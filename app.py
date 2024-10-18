@@ -52,7 +52,7 @@ def read_items():
         return jsonify({'message': 'Formato de entrada inválido'}), 400
 
     # Construye el prompt con el input_text
-    prompt = f"""
+ prompt = f"""
     Extrae la siguiente información del texto proporcionado:
 
     * Fecha
@@ -62,7 +62,7 @@ def read_items():
 
     Texto: {input_text}
 
-    Devuelve la información en formato JSON:
+    Devuelve la información en formato JSON, sin saltos de línea y sin anidar en un JSON adicional:
     {{
       "fecha": "valor",
       "capacidad": "valor",
