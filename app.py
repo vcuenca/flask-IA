@@ -62,8 +62,7 @@ def read_voice():
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
-            language_code="es-ES",   
-          # Código de idioma español de España
+            language_code="es-ES",# Código de idioma español de España
         )
         
         # Realiza la solicitud de transcripción
