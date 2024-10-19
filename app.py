@@ -48,6 +48,11 @@ def read_voice():
         data = request.get_json()
         input_text = data.get('input_text')
 
+        credentials_json = os.environ['GOOGLE_KEY']  # Reemplaza con tu JSON
+        credentials = json.loads(credentials_json)
+
+        # Crea un cliente para la API de Speech-to-Text con las credenciales
+        client = speech.SpeechClient(credentials=credentials)
         client = speech.SpeechClient()
         audio_bytes = base64.b64decode(input_text)
 
