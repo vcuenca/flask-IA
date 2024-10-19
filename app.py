@@ -33,7 +33,7 @@ def verify_api_key(api_key):
 
 # Endpoint protegido que requiere la clave API
 @app.route('/merca-ia-voice', methods=['POST'])
-def read_items():
+def read_voice():
     # Verifica la clave API en la cabecera de la solicitud
     api_key = request.headers.get('api_key')
     if not api_key:
@@ -49,11 +49,10 @@ def read_items():
         input_text = data.get('input_text')
 
         client = speech.SpeechClient()
-    
-        # Configura la ruta al archivo de audio que quieres transcribir
-        gcs_uri = "gs://cloud-samples-data/speech-to-text/audio.raw"
-        
-        audio = speech.RecognitionAudio(uri=gcs_uri)
+        audio_bytes = base64.b64decode(input_text)
+
+        # Crear un objeto RecognitionAudio a partir de los bytes del audio
+        audio = speech.RecognitionAudio(content=audio_bytes)
         
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
