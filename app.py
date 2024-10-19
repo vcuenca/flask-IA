@@ -2,6 +2,8 @@ import os
 from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
 import json
+from google.cloud import speech
+
 
 API_KEY = os.environ['GEMINI_KEY']  # Clave API para Gemini
 genai.configure(api_key=API_KEY)
@@ -29,6 +31,51 @@ def verify_api_key(api_key):
     if api_key != API_KEY:
         return jsonify({'message': 'Clave API inválida'}), 401
 
+# Endpoint protegido que requiere la clave API
+@app.route('/merca-ia-voice', methods=['POST'])
+def read_items():
+    # Verifica la clave API en la cabecera de la solicitud
+    api_key = request.headers.get('api_key')
+    if not api_key:
+        return jsonify({'message': 'Falta la clave API'}), 401
+
+    response = verify_api_key(api_key)
+    if response:
+        return response
+
+    # Obtiene el input del cuerpo de la solicitud
+    try:
+        data = request.get_json()
+        input_text = data.get('input_text')
+
+        client = speech.SpeechClient()
+    
+        # Configura la ruta al archivo de audio que quieres transcribir
+        gcs_uri = "gs://cloud-samples-data/speech-to-text/audio.raw"
+        
+        audio = speech.RecognitionAudio(uri=gcs_uri)
+        
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=16000,
+            language_code="es-ES",   
+          # Código de idioma español de España
+        )
+        
+        # Realiza la solicitud de transcripción
+        response = client.recognize(config=config, audio=audio)
+        
+        # Imprime los resultados
+        for result in response.results:
+            print("Transcripción: {}".format(result.alternatives[0].transcript))
+        
+        if not input_text:
+            return jsonify({'message': 'Falta el texto de entrada'}), 400
+    except:
+        return jsonify({'message': 'Formato de entrada inválido'}), 400
+        
+    
+    
 
 # Endpoint protegido que requiere la clave API
 @app.route('/merca-ia', methods=['POST'])
